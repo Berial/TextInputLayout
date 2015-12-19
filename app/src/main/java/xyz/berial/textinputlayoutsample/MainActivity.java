@@ -2,6 +2,8 @@ package xyz.berial.textinputlayoutsample;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SwitchCompat;
+import android.widget.CompoundButton;
 
 import xyz.berial.textinputlayout.TextInputLayout;
 
@@ -12,13 +14,26 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        TextInputLayout wrapper1 = (TextInputLayout) findViewById(R.id.wrapper1);
-        TextInputLayout wrapper2 = (TextInputLayout) findViewById(R.id.wrapper2);
+        final TextInputLayout wrapper1 = (TextInputLayout) findViewById(R.id.wrapper1);
+        SwitchCompat switch1 = (SwitchCompat) findViewById(R.id.switch1);
+        SwitchCompat switch2 = (SwitchCompat) findViewById(R.id.switch2);
 
-//        wrapper1.setErrorEnabled(true);
-//        wrapper2.setErrorEnabled(true);
-//
-//        wrapper1.setError("input1");
-//        wrapper2.setError("input2");
+
+        switch1.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                wrapper1.setError(isChecked ? "error" : "");
+                wrapper1.setErrorEnabled(true);
+            }
+        });
+
+        switch2.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                wrapper1.setCounterEnabled(isChecked);
+            }
+        });
     }
 }

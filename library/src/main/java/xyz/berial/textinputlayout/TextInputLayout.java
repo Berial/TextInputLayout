@@ -65,7 +65,7 @@ public class TextInputLayout extends LinearLayout {
     private Paint mTmpPaint;
 
     /*custom*/
-    private RelativeLayout mTooltip; // 底部提示框, 用于存放 errorView 和 textLengthLimitView
+    private RelativeLayout mBottomBar; // 底部提示框, 用于存放 errorView 和 textLengthLimitView
     private TextView mCounterView;
     private boolean mCounterEnabled;
     private int mCounterMaxLength;
@@ -112,8 +112,7 @@ public class TextInputLayout extends LinearLayout {
                 R.styleable.TextInputLayout_hintAnimationEnabled, true);
 
         /*custom*/
-        final boolean counterEnabled =
-                a.getBoolean(R.styleable.TextInputLayout_counterEnabled, false);
+        final boolean counterEnabled = a.getBoolean(R.styleable.TextInputLayout_counterEnabled, false);
         mCounterMaxLength = a.getInt(R.styleable.TextInputLayout_counterMaxLength, 0);
         /*custom*/
 
@@ -134,8 +133,8 @@ public class TextInputLayout extends LinearLayout {
         a.recycle();
 
         /*custom*/
-        mTooltip = new RelativeLayout(context);
-        addView(mTooltip);
+        mBottomBar = new RelativeLayout(context);
+        addView(mBottomBar);
         setCounterEnabled(counterEnabled);
         /*custom*/
 
@@ -254,8 +253,10 @@ public class TextInputLayout extends LinearLayout {
                 ViewCompat.setBackgroundTintList(mEditText,
                         ColorStateList.valueOf(mResources.getColor(R.color.design_textinput_error_color)));
             } else if (currentLength == mCounterMaxLength) {
+                if (!mErrorEnabled) {
+                    ViewCompat.setBackgroundTintList(mEditText, mFocusedTextColor);
+                }
                 mCounterView.setTextAppearance(getContext(), R.style.TextAppearance_Design_Counter);
-                ViewCompat.setBackgroundTintList(mEditText, mFocusedTextColor);
             }
         }
     }
@@ -363,7 +364,7 @@ public class TextInputLayout extends LinearLayout {
                 mErrorView = new TextView(getContext());
                 mErrorView.setTextAppearance(getContext(), mErrorTextAppearance);
                 mErrorView.setVisibility(INVISIBLE);
-                mTooltip.addView(mErrorView);
+                mBottomBar.addView(mErrorView);
 
                 if (mEditText != null) {
                     // Add some start/end padding to the error so that it matches the EditText
@@ -371,7 +372,7 @@ public class TextInputLayout extends LinearLayout {
                             0, ViewCompat.getPaddingEnd(mEditText), mEditText.getPaddingBottom());
                 }
             } else {
-                mTooltip.removeView(mErrorView);
+                mBottomBar.removeView(mErrorView);
                 mErrorView = null;
             }
             mErrorEnabled = enabled;
@@ -387,26 +388,26 @@ public class TextInputLayout extends LinearLayout {
         if (mCounterEnabled != enabled) {
             if (enabled) {
                 mCounterView = new TextView(getContext());
-                mCounterView.setTextAppearance(getContext(), R.style.TextAppearance_Design_Counter);
+                if (mEditText.length() > mCounterMaxLength) {
+                    mCounterView.setTextAppearance(getContext(), mErrorTextAppearance);
+                } else {
+                    mCounterView.setTextAppearance(getContext(), R.style.TextAppearance_Design_Counter);
+                }
                 // mCounterView.setVisibility(VISIBLE);
                 RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
                         RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
                 params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
                 params.addRule(RelativeLayout.CENTER_VERTICAL);
-                mTooltip.addView(mCounterView, params);
+                mBottomBar.addView(mCounterView, params);
 
                 if (mEditText != null) {
-                    mCounterView.setText(mResources.getString(R.string.counterMaxLength,
-                            mEditText.getText().length(), mCounterMaxLength));
                     // Add some start/end padding to the counter so that it matches the EditText
                     ViewCompat.setPaddingRelative(mCounterView, ViewCompat.getPaddingStart(mEditText),
                             0, ViewCompat.getPaddingEnd(mEditText), mEditText.getPaddingBottom());
-                } else {
-                    mCounterView.setText(mResources.getString(R.string.counterMaxLength,
-                            0, mCounterMaxLength));
                 }
+                mCounterView.setText(mResources.getString(R.string.counterMaxLength, 0, mCounterMaxLength));
             } else {
-                mTooltip.removeView(mCounterView);
+                mBottomBar.removeView(mCounterView);
                 mCounterView = null;
             }
             mCounterEnabled = enabled;
@@ -474,6 +475,11 @@ public class TextInputLayout extends LinearLayout {
                             }
                         }).start();
 
+                /*custom*/
+                if (mEditText.length() > mCounterMaxLength) {
+                    return;
+                }
+                /*custom*/
                 // Restore the 'original' tint, using colorControlNormal and colorControlActivated
                 final TintManager tintManager = TintManager.get(getContext());
                 ViewCompat.setBackgroundTintList(mEditText,

@@ -12,10 +12,34 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="xyz.berial.textinputlayoutsample.MainActivity">
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <android.support.v7.widget.SwitchCompat
+            android:id="@+id/switch1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginRight="32dp"
+            android:text="显示Error"/>
+
+        <android.support.v7.widget.SwitchCompat
+            android:id="@+id/switch2"
+            android:checked="true"
+            android:layout_marginLeft="32dp"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="显示计数器"/>
+    </LinearLayout>
+
     <xyz.berial.textinputlayout.TextInputLayout
         android:id="@+id/wrapper1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
         app:counterEnabled="true"
         app:counterMaxLength="10">
 
@@ -25,15 +49,4 @@
             android:hint="Hello World"/>
     </xyz.berial.textinputlayout.TextInputLayout>
 
-    <xyz.berial.textinputlayout.TextInputLayout
-        android:id="@+id/wrapper2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp">
-
-        <EditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Hello World"/>
-    </xyz.berial.textinputlayout.TextInputLayout>
 </LinearLayout>
