@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="TextInputLayout">
+        <attr name="hintTextAppearance" format="reference"/>
+        <attr name="hint" format="string|reference"/>
+        <attr name="errorEnabled" format="boolean"/>
+        <attr name="errorTextAppearance" format="reference"/>
+        <attr name="counterEnabled" format="boolean"/>
+        <attr name="counterMaxLength" format="integer"/>
+        <attr name="counterTextAppearance" format="reference"/>
+        <attr name="counterOverflowTextAppearance" format="reference"/>
+        <attr name="textColorHint" format="color"/>
+        <attr name="hintAnimationEnabled" format="boolean"/>
+    </declare-styleable>
+</resources>
