@@ -33,7 +33,6 @@ import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPropertyAnimatorListenerAdapter;
 import android.support.v4.view.accessibility.AccessibilityNodeInfoCompat;
 import android.text.Editable;
-import android.text.InputFilter;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
@@ -65,10 +64,12 @@ public class TextInputLayout extends LinearLayout {
 
     private Paint mTmpPaint;
 
+    /*custom*/
     private RelativeLayout mTooltip; // 底部提示框, 用于存放 errorView 和 textLengthLimitView
     private TextView mCounterView;
     private boolean mCounterEnabled;
     private int mCounterMaxLength;
+    /*custom*/
 
     private boolean mErrorEnabled;
     private TextView mErrorView;
@@ -110,9 +111,11 @@ public class TextInputLayout extends LinearLayout {
         mHintAnimationEnabled = a.getBoolean(
                 R.styleable.TextInputLayout_hintAnimationEnabled, true);
 
+        /*custom*/
         final boolean counterEnabled =
                 a.getBoolean(R.styleable.TextInputLayout_counterEnabled, false);
         mCounterMaxLength = a.getInt(R.styleable.TextInputLayout_counterMaxLength, 0);
+        /*custom*/
 
         if (a.hasValue(R.styleable.TextInputLayout_textColorHint)) {
             mDefaultTextColor = mFocusedTextColor =
@@ -130,10 +133,12 @@ public class TextInputLayout extends LinearLayout {
         final boolean errorEnabled = a.getBoolean(R.styleable.TextInputLayout_errorEnabled, false);
         a.recycle();
 
+        /*custom*/
         mTooltip = new RelativeLayout(context);
         addView(mTooltip);
-
         setCounterEnabled(counterEnabled);
+        /*custom*/
+
         setErrorEnabled(errorEnabled);
 
         if (ViewCompat.getImportantForAccessibility(this)
@@ -173,12 +178,13 @@ public class TextInputLayout extends LinearLayout {
         }
         mEditText = editText;
 
-        InputFilter[] filters = mEditText.getFilters();
-        if (filters != null && filters.length > 0) {
-            filters[0] = new InputFilter.LengthFilter(mCounterMaxLength);
-        } else {
-            mEditText.setFilters(new InputFilter[]{ new InputFilter.LengthFilter(mCounterMaxLength) });
-        }
+        // 设置输入文字最大长度限制
+//        InputFilter[] filters = mEditText.getFilters();
+//        if (filters != null && filters.length > 0) {
+//            filters[0] = new InputFilter.LengthFilter(mCounterMaxLength);
+//        } else {
+//            mEditText.setFilters(new InputFilter[]{ new InputFilter.LengthFilter(mCounterMaxLength) });
+//        }
 
         // Use the EditText's typeface, and it's text size for our expanded text
         mCollapsingTextHelper.setTypeface(mEditText.getTypeface());
@@ -190,10 +196,9 @@ public class TextInputLayout extends LinearLayout {
             @Override
             public void afterTextChanged(Editable s) {
                 updateLabelVisibility(true);
-                if (mCounterView != null) {
-                    mCounterView.setText(mResources.getString(R.string.counterMaxLength,
-                            s.length(), mCounterMaxLength));
-                }
+                /*custom*/
+                updateCounterText(s);
+                /*custom*/
             }
 
             @Override
@@ -221,14 +226,38 @@ public class TextInputLayout extends LinearLayout {
                     0, ViewCompat.getPaddingEnd(mEditText), mEditText.getPaddingBottom());
         }
 
+        /*custom*/
         if (mCounterView != null) {
             // Add some start/end padding to the error so that it matches the EditText
             ViewCompat.setPaddingRelative(mCounterView, ViewCompat.getPaddingStart(mEditText),
                     0, ViewCompat.getPaddingEnd(mEditText), mEditText.getPaddingBottom());
         }
+        /*custom*/
 
         // Update the label visibility with no animation
         updateLabelVisibility(false);
+    }
+
+    /**
+     * 更新计数器和底边颜色
+     *
+     * @param text 输入的文字
+     */
+    private void updateCounterText(Editable text) {
+        if (mCounterView != null) {
+            final int currentLength = text.length();
+            mCounterView.setText(mResources.getString(R.string.counterMaxLength,
+                    currentLength, mCounterMaxLength));
+
+            if (currentLength == mCounterMaxLength + 1) {
+                mCounterView.setTextAppearance(getContext(), mErrorTextAppearance);
+                ViewCompat.setBackgroundTintList(mEditText,
+                        ColorStateList.valueOf(mResources.getColor(R.color.design_textinput_error_color)));
+            } else if (currentLength == mCounterMaxLength) {
+                mCounterView.setTextAppearance(getContext(), R.style.TextAppearance_Design_Counter);
+                ViewCompat.setBackgroundTintList(mEditText, mFocusedTextColor);
+            }
+        }
     }
 
     private LayoutParams updateEditTextMargin(ViewGroup.LayoutParams lp) {
@@ -356,12 +385,9 @@ public class TextInputLayout extends LinearLayout {
      */
     public void setCounterEnabled(boolean enabled) {
         if (mCounterEnabled != enabled) {
-            if (mCounterView != null) {
-                ViewCompat.animate(mCounterView).cancel();
-            }
-
             if (enabled) {
                 mCounterView = new TextView(getContext());
+                mCounterView.setTextAppearance(getContext(), R.style.TextAppearance_Design_Counter);
                 // mCounterView.setVisibility(VISIBLE);
                 RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
                         RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
@@ -372,7 +398,7 @@ public class TextInputLayout extends LinearLayout {
                 if (mEditText != null) {
                     mCounterView.setText(mResources.getString(R.string.counterMaxLength,
                             mEditText.getText().length(), mCounterMaxLength));
-                    // Add some start/end padding to the error so that it matches the EditText
+                    // Add some start/end padding to the counter so that it matches the EditText
                     ViewCompat.setPaddingRelative(mCounterView, ViewCompat.getPaddingStart(mEditText),
                             0, ViewCompat.getPaddingEnd(mEditText), mEditText.getPaddingBottom());
                 } else {
