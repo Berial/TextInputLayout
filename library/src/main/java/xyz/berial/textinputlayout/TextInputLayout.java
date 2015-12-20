@@ -407,6 +407,11 @@ public class TextInputLayout extends LinearLayout {
             if (enabled) {
                 mCounterView = new TextView(getContext());
                 // mCounterView.setVisibility(VISIBLE);
+                if (mEditText != null && mEditText.length() > mCounterMaxLength) {
+                    mCounterView.setTextAppearance(getContext(), mErrorTextAppearance);
+                } else {
+                    mCounterView.setTextAppearance(getContext(), R.style.TextAppearance_Design_Counter);
+                }
                 RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
                         RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
                 params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
@@ -414,11 +419,6 @@ public class TextInputLayout extends LinearLayout {
                 mBottomBar.addView(mCounterView, params);
 
                 if (mEditText != null) {
-                    if (mEditText.length() > mCounterMaxLength) {
-                        mCounterView.setTextAppearance(getContext(), mErrorTextAppearance);
-                    } else {
-                        mCounterView.setTextAppearance(getContext(), R.style.TextAppearance_Design_Counter);
-                    }
                     // Add some start/end padding to the counter so that it matches the EditText
                     ViewCompat.setPaddingRelative(mCounterView, ViewCompat.getPaddingStart(mEditText),
                             0, ViewCompat.getPaddingEnd(mEditText), mEditText.getPaddingBottom());

@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 wrapper1.setError(isChecked ? "error" : "");
-                wrapper1.setErrorEnabled(true);
+                wrapper1.setErrorEnabled(isChecked);
             }
         });
 
