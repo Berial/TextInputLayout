@@ -364,18 +364,36 @@ public class TextInputLayout extends LinearLayout {
                 mErrorView = new TextView(getContext());
                 mErrorView.setTextAppearance(getContext(), mErrorTextAppearance);
                 mErrorView.setVisibility(INVISIBLE);
+                /*custom*/
                 mBottomBar.addView(mErrorView);
-
+                /*custom*/
                 if (mEditText != null) {
                     // Add some start/end padding to the error so that it matches the EditText
                     ViewCompat.setPaddingRelative(mErrorView, ViewCompat.getPaddingStart(mEditText),
                             0, ViewCompat.getPaddingEnd(mEditText), mEditText.getPaddingBottom());
                 }
             } else {
+                /*custom*/
                 mBottomBar.removeView(mErrorView);
+                /*custom*/
                 mErrorView = null;
             }
             mErrorEnabled = enabled;
+        }
+    }
+
+    /**
+     * 设置字数最长限制
+     *
+     * @param maxLength 字数最长限制
+     */
+    public void setCounterMaxLength(int maxLength) {
+        mCounterMaxLength = maxLength;
+        if (mEditText != null) {
+            mCounterView.setText(mResources.getString(R.string.counterMaxLength, mEditText.length(),
+                    maxLength));
+        } else {
+            mCounterView.setText(mResources.getString(R.string.counterMaxLength, 0, maxLength));
         }
     }
 
@@ -388,11 +406,6 @@ public class TextInputLayout extends LinearLayout {
         if (mCounterEnabled != enabled) {
             if (enabled) {
                 mCounterView = new TextView(getContext());
-                if (mEditText.length() > mCounterMaxLength) {
-                    mCounterView.setTextAppearance(getContext(), mErrorTextAppearance);
-                } else {
-                    mCounterView.setTextAppearance(getContext(), R.style.TextAppearance_Design_Counter);
-                }
                 // mCounterView.setVisibility(VISIBLE);
                 RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
                         RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
@@ -401,6 +414,11 @@ public class TextInputLayout extends LinearLayout {
                 mBottomBar.addView(mCounterView, params);
 
                 if (mEditText != null) {
+                    if (mEditText.length() > mCounterMaxLength) {
+                        mCounterView.setTextAppearance(getContext(), mErrorTextAppearance);
+                    } else {
+                        mCounterView.setTextAppearance(getContext(), R.style.TextAppearance_Design_Counter);
+                    }
                     // Add some start/end padding to the counter so that it matches the EditText
                     ViewCompat.setPaddingRelative(mCounterView, ViewCompat.getPaddingStart(mEditText),
                             0, ViewCompat.getPaddingEnd(mEditText), mEditText.getPaddingBottom());
